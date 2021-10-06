@@ -1,6 +1,6 @@
 # Lagrange Polynomials
 
-Module to generate Lagrange polynomials for 1-dimensional data.
+Module to generate Lagrange polynomials over integers for 1-dimensional data.
 This is generally useful for interpolation.
 
 ## Interface
@@ -8,7 +8,7 @@ This is generally useful for interpolation.
 ```python
 from lagrange_polynomial import LagrangePolynomial
 
-xs = range(0, 100)
+xs = range(100)
 ys = [f(x) for x in xs]          # For some function f
 
 lp = LagrangePolynomial(xs, ys)  # Instantiate a polynomial with sequences of

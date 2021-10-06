@@ -1,3 +1,3 @@
 """Installation instructions"""
-import setuptools
+import setuptools # type: ignore
 setuptools.setup()
