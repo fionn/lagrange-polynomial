@@ -32,3 +32,7 @@ The instance is a Lagrange polynomial _L_: _x_ -> _L_(_x_) over GF(_p_). If _p_ 
 
 It has a `basis` property, a `LagrangeBasis` object subclassing `Sequence`.
 Each element _ℓⱼ_ indexed by integers _j_ in `range(len(xs))` is a function taking _x_ to its _j_<sup>th</sup> basis vector _ℓⱼ_(_x_).
+
+## Test
+
+Test with `make test`.
