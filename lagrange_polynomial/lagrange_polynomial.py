@@ -7,13 +7,22 @@ from typing import Callable, Union, overload
 
 Polynomial = Callable[[int], int]
 
-# pylint: disable=too-few-public-methods
 class LagrangeBasis(Sequence[Polynomial]):
     """Factory class for Lagrange basis polynomials"""
 
     def __init__(self, x_points: Sequence[int], prime: int) -> None:
         self.xs = x_points
         self.prime = prime
+        self._index = 0
+
+    def __iter__(self) -> "LagrangeBasis":
+        return self
+
+    def __next__(self) -> Polynomial:
+        if self._index < len(self):
+            self._index += 1
+            return self[self._index -1]
+        raise StopIteration
 
     def __len__(self) -> int:
         return len(self.xs)
@@ -30,31 +39,37 @@ class LagrangeBasis(Sequence[Polynomial]):
                                                            list[Polynomial]]:
         if isinstance(key, int):
             return partial(self._basis, key)
+
         step = key.step or 1
+        start = key.start or 0
         return [partial(self._basis, j) \
-                for j in range(key.start, key.stop, step)]
+                for j in range(start, key.stop, step)]
 
     def _basis(self, j: int, x: int) -> int:
-        """Lagrange basis polynomial l_j(x)"""
+        """Lagrange basis polynomial ℓ_j(x)"""
         x_j = self.xs[j]
-        product = 1
-        for x_m in self.xs:
-            if x_m != x_j:
-                product *= (x - x_m) // (x_j - x_m)
-        return product
+        product = 1.0
+        for m, x_m in enumerate(self.xs):
+            if m != j:
+                product *= (x - x_m) / (x_j - x_m)
+                product %= self.prime
+        return int(product)
 
-# pylint: disable=too-few-public-methods
 class LagrangePolynomial:
-    """Instantiates a Lagrange polynomial function"""
+    """Lagrange polynomial function"""
 
     def __init__(self, x_points: Sequence[int],
-                 y_points: Sequence[int], prime: int) -> None:
+                 y_points: Sequence[int], prime: int = None) -> None:
         self.xs = x_points
         self.ys = y_points
+
         if len(self.xs) != len(self.ys):
             raise RuntimeError("The number of x- and y-coordinates must be equal")
-        self.basis = LagrangeBasis(self.xs, prime)
-        self.prime = prime
+        if len(self.xs) != len(set(self.xs)):
+            raise RuntimeError("All x-coordinates must be unique")
+
+        self.prime = prime or 2 ** 31 - 1
+        self.basis = LagrangeBasis(self.xs, self.prime)
 
     def __repr__(self) -> str:
         return f"LagrangePolynomial(xs, ys, {self.prime})"
@@ -67,20 +82,20 @@ class LagrangePolynomial:
         total = 0
         for j, y in enumerate(self.ys):
             total += y * self.basis[j](x)
-        return total
+        return total % self.prime
 
 def main() -> None:
     """Entry point"""
-    xs = range(700)
-    ys = [x ** 6 for x in xs]
+    xs = range(1, 6)
+    ys = [x ** 3 for x in xs]
 
-    lagrange_poly = LagrangePolynomial(xs, ys, prime=2 ** 32 - 1)
+    lp = LagrangePolynomial(xs, ys, 17)
 
-    for x in xs[620:]:
-        print(x, ys[x], lagrange_poly(x))
-        assert ys[x] == lagrange_poly(x)
+    for x, y in zip(xs, ys):
+        print(x, y, y % lp.prime, lp(x))
+        assert y % lp.prime == lp(x)
 
-    print(lagrange_poly(0))
+    print(lp(0))
 
 if __name__ == "__main__":
     main()

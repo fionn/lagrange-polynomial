@@ -3,7 +3,13 @@
 Module to generate Lagrange polynomials over integers for 1-dimensional data.
 This is generally useful for interpolation.
 
-## Interface
+## Installation
+
+Install with `pip`.
+
+## Usage
+
+### Example
 
 ```python
 from lagrange_polynomial import LagrangePolynomial
@@ -19,8 +25,10 @@ for x in xs:
     coefficient = lp.basis[0](x) # Get the 0th basis vector at x
 ```
 
-`LagrangePolynomial` takes two equally-sized sequences on initialisation.
-The instance is a Lagrange polynomial _L_: _x_ -> _L_(_x_).
+### Interface
+
+The `LagrangePolynomial` class takes two equally-sized sequences and an optional integer _p_.
+The instance is a Lagrange polynomial _L_: _x_ -> _L_(_x_) over GF(_p_). If _p_ is not provided, it defaults to the 8<sup>th</sup> Mersenne prime _M_<sub>31</sub>.
 
 It has a `basis` property, a `LagrangeBasis` object subclassing `Sequence`.
-Each element indexed by integers in `range(len(xs))` is a function taking _x_ to its basis vector.
+Each element _ℓⱼ_ indexed by integers _j_ in `range(len(xs))` is a function taking _x_ to its _j_<sup>th</sup> basis vector _ℓⱼ_(_x_).
